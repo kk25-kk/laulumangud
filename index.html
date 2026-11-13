@@ -1,9 +1,11 @@
 <!doctype html><html lang="et"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Patsu, patsu, kooki</title>
+<title>Laulumängude kogumik</title>
+<meta name="description" content="Eesti pärimuslikud laulumängud lastele. Vaata liigutusi, loe laulusõnu ja mängi kaasa.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="landing.css">
 <style>
 /* Layout: one stage (the film) on top, a control strip under it, then the song lines as a jump list. */
 :root {
@@ -52,9 +54,6 @@ button, .chip {
 button:hover { border-color: var(--muted); }
 button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 #play { background: var(--accent); color: var(--accent-ink); border-color: transparent; min-width: 116px; }
-.tempo { display: flex; align-items: center; gap: 8px; font-weight: 600; }
-.tempo input { width: 140px; accent-color: var(--accent); }
-.tempo output { font-variant-numeric: tabular-nums; min-width: 92px; color: var(--muted); }
 .check { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer; }
 .check input { width: 18px; height: 18px; accent-color: var(--accent); }
 .spacer { flex: 1 1 0; }
@@ -65,6 +64,9 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); ou
 .music { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 12px; }
 .music h2 { margin: 0; }
 .music p { margin: 0; color: var(--muted); font-size: 14px; }
+.music-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.music-options button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.music-options button:disabled { opacity: .66; cursor: default; border-color: var(--line); }
 .music input[type="file"] { max-width: 100%; font: inherit; }
 .music input::file-selector-button { font: 700 15px var(--font-body); background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 999px; padding: 10px 16px; margin-right: 12px; cursor: pointer; }
 .music audio { width: 100%; }
@@ -85,15 +87,58 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
 .notes { color: var(--muted); max-width: 68ch; margin: 0; padding-left: 20px; display: grid; gap: 4px; }
 @media (max-width: 640px) {
   .lines button { grid-template-columns: 1fr; }
-  .tempo input { width: 110px; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
 </style>
 
-<div class="wrap">
+<div class="landing" id="landing" hidden>
+  <header class="site-header">
+    <div class="landing-width site-header-inner">
+      <a class="wordmark" href="./">Laulumängude kogumik</a>
+    </div>
+  </header>
+
+  <main class="landing-width">
+    <section class="landing-hero" aria-labelledby="landing-title">
+      <div class="hero-copy">
+        <p class="landing-kicker">Praktiline abivahend rühmaõpetajale</p>
+        <h1 id="landing-title">Laulame ja<br>mängime!</h1>
+        <p>Kogumikus on seitse laulumängu 3–7-aastastele lastele. Kogumik valmis magistritöö raames metoodilise materjalina, et toetada laste sotsiaal-emotsionaalseid kompetentse laulumängude kaudu.</p>
+        <a class="hero-action" href="#laulumangud">Vali laulumäng <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="hero-visual">
+        <img src="assets/laulumangude-ring.jpg" width="1200" height="800" alt="Lapsed hoiavad aasal ringis kätest kinni ja laulavad.">
+      </div>
+    </section>
+
+    <section class="game-catalog" id="laulumangud" aria-labelledby="catalog-title">
+      <h2 id="catalog-title">Leia oma laulumäng</h2>
+      <div class="age-groups">
+        <details class="age-group">
+          <summary>3–4-aastastele</summary>
+          <ul class="landing-games" data-age="3–4 a"></ul>
+        </details>
+        <details class="age-group">
+          <summary>6–7-aastastele</summary>
+          <ul class="landing-games" data-age="6–7 a"></ul>
+        </details>
+        <details class="age-group">
+          <summary>3–7-aastastele</summary>
+          <ul class="landing-games" data-age="3–7 a"></ul>
+        </details>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="wrap" id="game-view" hidden>
+  <div class="game-topbar">
+    <a class="back-to-landing" href="./#laulumangud"><span aria-hidden="true">←</span> Kõik laulumängud</a>
+    <p class="game-age" id="game-age"></p>
+  </div>
   <nav class="games" id="games" aria-label="Vali laulumäng"></nav>
   <header>
-    <h1>Patsu, patsu, kooki</h1>
+    <h1 id="game-title">Patsu, patsu, kooki</h1>
     <p class="meta">Laulumäng 3–4-aastastele · Keila kihelkond, Eesti Rahvaluule Arhiiv · G-duur</p>
   </header>
 
@@ -104,22 +149,25 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
   <div class="controls">
     <button id="play" type="button">▶ Mängi</button>
     <button id="restart" type="button">Algusest</button>
-    <label class="tempo" for="bpm">Tempo <input id="bpm" type="range" min="50" max="120" step="5" value="90"><output id="bpmOut">90 lööki/min</output></label>
-    <label class="check" for="loop"><input id="loop" type="checkbox"> Korda rida</label>
     <label class="check" for="sound"><input id="sound" type="checkbox" checked> Plaksud ja takt</label>
     <span class="spacer"></span>
     <button id="full" type="button">Täisekraan</button>
   </div>
 
   <section class="music" aria-labelledby="musicTitle">
-    <h2 id="musicTitle">Sinu muusika</h2>
+    <h2 id="musicTitle">Vali muusikapala</h2>
+    <div class="music-options" role="group" aria-label="Laulumängu salvestised">
+      <button type="button" data-recording="saateta" aria-pressed="false">Laulumängud saateta</button>
+      <button type="button" data-recording="saatega" aria-pressed="false">Laulumängud saatega</button>
+    </div>
+    <p id="missingRecording" hidden>Sellel mängul on ainult saatega salvestis.</p>
     <label for="musicFile">Lisa oma helifail</label>
     <input id="musicFile" type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac,.aac" aria-describedby="musicPrivacy musicStatus">
     <p id="musicPrivacy">Fail mängib ainult selles brauseris. Seda ei laadita serverisse. Lehe uuesti avamisel vali fail uuesti.</p>
-    <p id="musicStatus" role="status">Vali MP3, WAV või muu brauseri toetatud helifail.</p>
-    <audio id="music" controls preload="metadata" hidden aria-label="Sinu muusika"></audio>
+    <p id="musicStatus" role="status"></p>
+    <audio id="music" controls preload="metadata" hidden aria-label="Valitud muusikapala"></audio>
     <button id="removeMusic" type="button" hidden>Eemalda muusika</button>
-    <p>Mängi, Paus ja Algusest juhivad ka muusikat. Tempo, rea valik ja rea kordamine muudavad ainult animatsiooni.</p>
+    <p>Animatsiooni või helimängija esitusnupp käivitab ja peatab animatsiooni koos valitud muusikapalaga. „Algusest” alustab mõlemat uuesti. Kui muusikapala pole valitud, käivitab „Mängi” animatsiooni.</p>
   </section>
 
   <h2>Read ja liigutused</h2>
@@ -129,17 +177,17 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
   <ul class="notes" id="notes"></ul>
 </div>
 
+<script src="recording-cues.js"></script>
 <script>
 (() => {
   const W = 1280, H = 720, SCALE = 1.5;
-  const canvas = document.getElementById('film');
-  const ctx = canvas.getContext('2d');
-  const requested = new URLSearchParams(location.search).get('game');
+  const params = new URLSearchParams(location.search);
+  const requested = params.get('game');
   // Beat (in 4-beat line units) on which the leader's hands land on the chosen kid's palms.
   const CONTACT_BEAT = 3;
-  const MELODY_NOTE = 'PDF-is pole meloodiat. Kasuta oma helifaili või laula ise; tempot saab muuta.';
   const wordGap = w => w.endsWith('-') ? '' : ' ';
   const joinWords = words => words.map((w, i) => i < words.length - 1 ? w + wordGap(w) : w).join('');
+  const splitWords = chunks => chunks.flatMap(chunk => chunk.split(' '));
   const lyric = (words, act, lead, extra = {}) => ({ words, act, lead, wordBeats: words.map((_, i) => words.length === 2 ? i * 2 : i), ...extra });
 
   const TAKE_HAND = { kind: 'crouchLate', chosenKind: 'takenHand', leadKind: 'takeHand', act: 'Kõik teised kükitavad seal, kus nad on.', lead: 'Võtab valitud lapsel käest kinni: tema on järgmine hunt.', form: { walk: 0.9, stopAt: 1.8 }, path: { mode: 'nextTo', dur: 1.6 }, takeLink: true };
@@ -152,7 +200,6 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
       sound: 'Plaksud ja takt', soundWord: 'Plaksud',
       room: { wall: ['#CFE7E4', '#DDEFEB'], flags: ['#E84C3D', '#F2B705', '#2E9E6B', '#3D7DD8', '#D94F8C'], rug: ['#3D7DD8', '#5B95E3'] },
       notes: [
-        'PDF-is pole meloodiat, seega animatsioonis on ainult plaksud ja takt. Laulge ise peale; tempot saab muuta.',
         '„Ahju kuuma pista!” ajal astuvad lapsed sammu ringi keskele ega tule tagasi. Kordusel astuvad nad veel ühe sammu.',
         '„Nämm-nämm” tuleb kohe pärast rida „Sööme koogi ära”, ühe takti jooksul.',
       ],
@@ -166,7 +213,7 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
       notes: [
         'Alguses istuvad lapsed ringis. Enne esimest salmi tõusevad nad püsti, sest esimese rea tegevus on juhendis seistes.',
         'Iga kahe rea pikkune salm kordub kaks korda. Animatsioonis on igale reale neli lööki; juhend täpset rütmi ei määra.',
-        'Juhendis on akordid G, C, Am, D, G, kuid meloodiat pole. Kasuta oma helifaili või laula ise.',
+        'Juhendis on akordid G, C, Am, D, G.',
         'Pärast „Pilla-palla” jäävad lapsed sinna, kuhu nad jooksid. Ringi nad tagasi ei lähe.',
         '„Tühjaks saigi sügis-korv”: peopesad üleval rinna kõrgusel, käed liiguvad vaheldumisi üles ja alla nagu „6-7” liigutuses.',
       ],
@@ -182,7 +229,6 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
         'Juhendis on „üle metsa” juures märge x3. Animatsioonis on see üks rida, kus „üle metsa” kõlab kolm korda.',
         'Juhi teekond on näitlik: juhend ütleb ainult, et ta liigub ringis päripäeva ja teeb väravate all slaalomit.',
         'Väravaks võtavad lapsed kätest kinni ja tõstavad ühendatud käed üles. Jänkuhüpped tehakse püsti.',
-        MELODY_NOTE,
       ],
       intro: { kind: 'stand', leadKind: 'idle', act: 'Lapsed seisavad ringis, käed all.', lead: 'Juht seisab ringi keskel.', path: { mode: 'center' } },
       lines: [
@@ -215,8 +261,7 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
         'Esimesel korral sirutavad lapsed kükis, teisel korral tõusevad püsti ja hõõruvad silmi seistes, nagu juhendis. „Jookse, jookse” ajal liiguvad kõik ruumis.',
         'Lõpus läheb tempo kiiremaks ja viimasel real jälle aeglasemaks, nagu juhendis märgitud.',
         'Kui hunt võtab lapsel käest kinni, saab sellest lapsest uus hunt. Animatsioonis vahetavad nad rollid ja hundikõrvad lähevad uuele hundile.',
-        'Juhend ei ütle, kus lapsed kükitavad. Animatsioonis kükitavad nad seal, kus nad parajasti on.',
-        MELODY_NOTE,
+        'Lapsed kükitavad vabalt valitud kohas.',
       ],
       intro: { kind: 'crouch', leadKind: 'sleep', act: 'Lapsed kükitavad näoga ringi keskele.', lead: 'Hunt magab ringi keskel.', path: { mode: 'center' }, form: { r: 0.95 } },
       lines: [
@@ -252,7 +297,6 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
         'Juhendis on salm üks kord, seega paarilise vahetus on näidatud ühe korra.',
         '„Ära sa tiri”: paarid hoiavad kahe käega kinni ja kordamööda tõmbab üks teist enda poole.',
         'Pärast „Ššhh!” jäävad lapsed kükki.',
-        MELODY_NOTE,
       ],
       intro: { kind: 'standHold', act: 'Lapsed seisavad ringis paarilisega kõrvuti, käest kinni.', links: 'pairs' },
       lines: [
@@ -278,7 +322,6 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
         'Kõik salmid ja refrään korduvad kaks korda. „Tõuse, tõuse” kordusel laskub juht kiiresti kükki ja tõuseb uuesti.',
         'Valitud lapsest saab uus juht. Animatsioonis vahetavad juht ja valitud laps kohad ning kroon läheb uuele juhile.',
         'Keksimine ja tantsimine on näidatud väikeste hüpetena koos kätega.',
-        MELODY_NOTE,
       ],
       intro: { kind: 'stand', leadKind: 'crouch', act: 'Lapsed seisavad näoga ringi keskele.', lead: 'Juht kükitab ringi keskel.', path: { mode: 'center' } },
       lines: [
@@ -308,36 +351,68 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
       sound: 'Plaks ja takt', soundWord: 'Plaks',
       room: { wall: ['#E3DDF0', '#EFEBF6'], flags: ['#9B59B6', '#16A3B8', '#F28C28', '#D94F8C', '#7CB342'], rug: ['#9B59B6', '#B983CC'], decor: drawMill },
       notes: [
-        'Juhend ei ütle, kas lapsed tõusevad enne rida „Otsi, otsi”. Animatsioonis jäävad nad kükki.',
+        'Sõnadel „Otsi, otsi” püsivad lapsed kükis paigal ja tõstavad otsimiseks ühe käe kulmude juurde.',
         '„Kivi” on värviline kivike juhi kätes. Viimasel löögil paneb juht selle plaksuga valitud lapse peopesadesse.',
-        MELODY_NOTE,
       ],
       intro: { kind: 'stand', leadKind: 'idle', act: 'Lapsed seisavad ringis, käed vabalt kõrval.', lead: 'Juht („kirev kivi”) seisab ringi keskel.', path: { mode: 'center' } },
       lines: [
         lyric(['Sõõri-', 'vääri,', 'sõrmekene,'], 'Võtavad kätest kinni ja kõnnivad rahulikult päripäeva.', 'Tõstab käed enda ette ja veeretab neid ümber teineteise.', { kind: 'holdWalk', leadKind: 'peel', links: 'ring', form: { rot: 0.2, r: 0.8 }, path: { mode: 'center' } }),
         lyric(['kuhu', 'veeres', 'kirev', 'kivi?'], 'Kõnnivad edasi ringis.', 'Liigub ringi sees vastupäeva.', { kind: 'holdWalk', leadKind: 'roam', links: 'ring', form: { rot: 0.2 }, path: { mode: 'circle', rate: -0.5, radius: 0.5, dur: 1 } }),
         lyric(['Veeres', 'vana', 'veski', 'taha,'], 'Lasevad kätest lahti ja veeretavad käsi enda ees.', 'Liigub ringis olijate vahel (slaalom).', { kind: 'peel', leadKind: 'roam', path: { mode: 'slalom', rate: -0.45, dur: 1 } }),
-        lyric(['kukkus', 'kuldse', 'künka', 'taha.'], 'Kükitavad.', 'Jätkab slaalomit.', { kind: 'quickSquat', leadKind: 'roam', path: { mode: 'slalom', rate: -0.45, dur: 0.01 } }),
-        lyric(['Otsi,', 'otsi,', 'ära', 'väsi,'], 'Kükis tõstavad käe kulmude juurde ja otsivad.', 'Jätkab slaalomit.', { kind: 'searchCrouch', leadKind: 'roam', path: { mode: 'slalom', rate: -0.45, dur: 0.01 } }),
+        lyric(['kukkus', 'kuldse', 'künka', 'taha.'], 'Kükitavad kohapeal.', 'Jätkab slaalomit.', { kind: 'crouchInPlace', leadKind: 'roam', path: { mode: 'slalom', rate: -0.45, dur: 0.01 } }),
+        lyric(['Otsi,', 'otsi,', 'ära', 'väsi,'], 'Püsivad kükis paigal ja tõstavad ühe käe kulmude juurde.', 'Jätkab slaalomit.', { kind: 'searchCrouch', leadKind: 'roam', path: { mode: 'slalom', rate: -0.45, dur: 0.01 } }),
         lyric(['enne', 'kui sind', 'hüüab', 'käsi!'], 'Kükis sirutavad käed ette, peopesad üleval, ja hüüavad „Aaee!”.', 'Valib lapse, läheb tema ette ja paneb „kivi” tema peopesadesse.', { kind: 'palmsShout', leadKind: 'giveStone', reach: 'palms', chosen: 0, path: { mode: 'toKid', dur: 1.8, near: 0.22 }, bubble: { text: 'Aaee!', from: 2, to: 3.9 }, sounds: [[CONTACT_BEAT, 'clap']] }),
       ],
       seq: [[0, 'SALM'], [1, 'SALM'], [2, 'SALM'], [3, 'SALM'], [4, 'SALM'], [5, 'SALM']],
     },
   };
-  const GAME_ID = requested in GAMES ? requested : 'kooki';
+  const gameHref = id => `./?game=${id}`;
+  if (!params.has('game') && !params.has('export')) {
+    const summaries = {
+      kooki: 'Plaksuta, veereta tainast ja küpseta koos lastega kooki.',
+      oravake: 'Koputa rütmis, näita oravasaba ja hüppa nagu orav.',
+      tihane: 'Mängi lindu ja lenda laulu lõpus vabalt ringi.',
+      kuu: 'Ärka, jookse ja vaata, kelle hunt järgmiseks valib.',
+      siil: 'Näita siiliokkaid ja leia ringis uus paariline.',
+      tera: 'Kasva terast kõrreks, siruta ja keksle laulu rütmis.',
+      soori: 'Kõnni ringis ja uuri, kelle pihku jõuab kirev kivi.',
+    };
+    const lists = document.querySelectorAll('.landing-games');
+    for (const [id, game] of Object.entries(GAMES)) {
+      const list = Array.from(lists).find(list => list.dataset.age === game.age);
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.className = 'landing-card';
+      link.href = gameHref(id);
+      link.innerHTML = `
+        <span class="card-title"></span>
+        <span class="card-summary"></span>`;
+      link.querySelector('.card-title').textContent = game.title;
+      link.querySelector('.card-summary').textContent = summaries[id];
+      item.append(link);
+      list.append(item);
+    }
+    document.getElementById('landing').hidden = false;
+    return;
+  }
+  const canvas = document.getElementById('film');
+  const ctx = canvas.getContext('2d');
+  const GAME_ID = Object.prototype.hasOwnProperty.call(GAMES, requested) ? requested : 'kooki';
   const isSquirrel = GAME_ID === 'oravake';
   const GAME = GAMES[GAME_ID];
   const ENGINE = Boolean(GAME.lines);
   const gameTitle = GAME.title;
   document.title = gameTitle;
-  document.querySelector('h1').textContent = gameTitle;
+  document.getElementById('game-title').textContent = gameTitle;
+  document.getElementById('game-age').textContent = `Vanuserühm: ${GAME.age.replace(/ a$/, ' aastat')}`;
   document.querySelector('.meta').textContent = GAME.meta;
   canvas.setAttribute('aria-label', GAME.aria);
   document.querySelector('label[for="sound"]').lastChild.textContent = ' ' + GAME.sound;
   const nav = document.getElementById('games');
   for (const [id, g] of Object.entries(GAMES)) {
+    if (g.age !== GAME.age) continue;
     const a = document.createElement('a');
-    a.href = id === 'kooki' ? './' : `./?game=${id}`;
+    a.href = gameHref(id);
     a.textContent = g.title; a.title = g.age;
     if (id === GAME_ID) a.setAttribute('aria-current', 'page');
     nav.appendChild(a);
@@ -603,7 +678,11 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
       const k = ease(clamp(lb / 0.5));
       return { ...REST, ...hands(lerp(-58, -50, k), lerp(-96, -150, k), lerp(58, 30, k), lerp(-96, -318, k)), brow: k, sway: 14 * Math.sin(Math.PI * lb), mouth: singMouth(lb) };
     },
-    searchCrouch: lb => ({ ...POSES.search(lb), crouch: 1 }),
+    crouchInPlace: lb => mixPose(REST, CROUCH, ease(clamp(lb / 0.4))),
+    searchCrouch(lb) {
+      const lift = ease(clamp(lb / 0.5));
+      return { ...CROUCH, rx: lerp(CROUCH.rx, 30, lift), ry: lerp(CROUCH.ry, -318, lift), brow: lift };
+    },
     spines(lb) { const k = ease(clamp(lb / 0.5)); return { ...REST, ...toward(k, 66, -330), fingers: 1, mouth: singMouth(lb) }; },
     // The demonstrator taps forward; ring kids get the partner's shoulder as target in tapShoulders.
     tap(lb) {
@@ -644,7 +723,11 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
       const sq = ease(clamp(lb / 0.4));
       return { ...REST, crouch: sq, ...hands(-x, y, x, y), gold: sq * o, fingers: o, mouth: singMouth(lb) };
     },
-    palmsShout(lb) { const k = ease(clamp(lb / 0.4)); return { ...REST, crouch: 1, ...hands(lerp(CROUCH.lx, -34, k), lerp(CROUCH.ly, -168, k), lerp(CROUCH.rx, 34, k), lerp(CROUCH.ly, -168, k)), open: k, mouth: lb >= 2.6 && lb < 3.7 ? 1 : singMouth(lb) }; },
+    palmsShout(lb) {
+      const palms = { ...CROUCH, ...hands(-34, -168, 34, -168), open: 1 };
+      const pose = mixPose(POSES.searchCrouch(1), palms, ease(clamp(lb / 0.4)));
+      return { ...pose, mouth: lb >= 2.6 && lb < 3.7 ? 1 : singMouth(lb) };
+    },
     giveStone: lb => mixPose(POSES.wander(lb), { ...REST, ...hands(-22, -150, 22, -150), open: 1, elbowLow: 1, mouth: singMouth(lb) }, ease(clamp((lb - 1.7) / 0.5))),
     leaderSinkRise(lb) { const down = lb < 0.8 ? ease(lb / 0.8) : 1 - ease(clamp((lb - 0.8) / 2.6)); return { ...mixPose(REST, CROUCH, down), mouth: singMouth(lb) }; },
     hideEnd: () => POSES.hideShush(4),
@@ -1263,7 +1346,7 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
     return drawKid(LEADER, 215, 545, 0.98, false, beat);
   }
 
-  function render(beat) {
+  function render(beat, lyrics) {
     ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
     ctx.clearRect(0, 0, W, H);
     drawRoom(beat);
@@ -1311,10 +1394,11 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
     ctx.font = '600 17px "Nunito", "Segoe UI", sans-serif';
     ctx.fillStyle = GAME.room.sub ?? 'rgba(30,43,71,0.7)';
     ctx.fillText('Vaata ja tee järele', 36, 80);
-    const nxt = segs[i + 1];
-    if (nxt && nxt.kind !== 'end') {
+    const next = segs[i + 1];
+    const nextWords = lyrics ? lyrics.nextWords : next?.kind === 'end' ? null : next?.words;
+    if (nextWords) {
       ctx.textAlign = 'right';
-      ctx.fillText('Järgmine: ' + joinWords(nxt.words), W - 36, 54);
+      ctx.fillText('Järgmine: ' + joinWords(nextWords), W - 36, 54);
     }
 
     ctx.fillStyle = '#1E2B47'; ctx.fillRect(0, 590, W, 130);
@@ -1336,9 +1420,10 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
 
     let x = 170;
     ctx.font = '700 42px "Baloo 2", "Trebuchet MS", sans-serif';
-    const wi = s.wordBeats ? s.wordBeats.filter(t => lb >= t).length - 1 : s.words.length === 1 ? 0 : (s.kind === 'intro' ? curBeat : Math.min(curBeat, 3));
-    s.words.forEach((w, k) => {
-      const active = k === wi && (s.wordBeats || s.kind === 'intro' || s.words.length === 1 || lb < s.len - 1);
+    const lyricWords = lyrics?.words ?? s.words;
+    const wi = lyrics?.wordIndex ?? (s.wordBeats ? s.wordBeats.filter(t => lb >= t).length - 1 : lyricWords.length === 1 ? 0 : Math.min(curBeat, 3));
+    lyricWords.forEach((w, k) => {
+      const active = k === wi && (lyrics || s.wordBeats || s.kind === 'intro' || lyricWords.length === 1 || lb < s.len - 1);
       ctx.fillStyle = active ? '#FFC93C' : (k < wi || (lb >= s.len - 1 && s.kind !== 'intro') ? '#FFFFFF' : 'rgba(255,255,255,0.5)');
       ctx.fillText(w, x, 640);
       x += ctx.measureText(w + (s.kind === 'intro' ? '   ' : wordGap(w))).width;
@@ -1396,53 +1481,98 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
   };
 
   const playBtn = document.getElementById('play');
-  const bpmIn = document.getElementById('bpm'), bpmOut = document.getElementById('bpmOut');
-  const loopIn = document.getElementById('loop'), soundIn = document.getElementById('sound');
+  const soundIn = document.getElementById('sound');
   const linesEl = document.getElementById('lines');
-  let bpm = DEFAULT_BPM, beat = 0, playing = false, lastTs = 0, audio = null;
+  let beat = 0, playing = false, lastTs = 0, audio = null;
   const EVENTS = window.patsu.events();
   const START_BEAT = 0;
   const music = document.getElementById('music');
   const musicFile = document.getElementById('musicFile');
   const musicStatus = document.getElementById('musicStatus');
   const removeMusic = document.getElementById('removeMusic');
-  let musicUrl = null, musicReady = false, musicName = '';
+  const recordingButtons = document.querySelectorAll('[data-recording]');
+  let musicUrl = null, musicName = '', recording = null;
 
   function clearMusic(resetSelection = true) {
-    musicReady = false;
-    music.pause(); music.removeAttribute('src'); music.load();
-    if (musicUrl) URL.revokeObjectURL(musicUrl);
+    if (musicUrl?.startsWith('blob:')) URL.revokeObjectURL(musicUrl);
     musicUrl = null; musicName = '';
+    recording = null;
+    music.pause(); music.removeAttribute('src'); music.load();
     if (resetSelection) musicFile.value = '';
+    for (const button of recordingButtons) button.setAttribute('aria-pressed', 'false');
     music.hidden = true; removeMusic.hidden = true;
   }
+
+  function loadMusic(url, name, button) {
+    beat = START_BEAT;
+    setPlaying(false);
+    clearMusic(Boolean(button));
+    musicName = name;
+    musicUrl = url;
+    if (button) {
+      recording = RECORDING_CUES[GAME_ID]?.[button.dataset.recording];
+      button.setAttribute('aria-pressed', 'true');
+    }
+    musicStatus.textContent = 'Avan: ' + name;
+    removeMusic.hidden = false;
+    music.src = url;
+  }
+
+  for (const button of recordingButtons) {
+    const version = button.dataset.recording;
+    if (GAME_ID === 'kuu' && version === 'saateta') {
+      button.disabled = true;
+      document.getElementById('missingRecording').hidden = false;
+      continue;
+    }
+    button.addEventListener('click', () => {
+      loadMusic(`assets/audio/${version}/${GAME_ID}.m4a`, `${GAME.title} (${version})`, button);
+    });
+  }
+
   function playMusic() {
-    if (!musicReady || !music.paused) return;
+    if (!musicUrl || !music.paused || (music.ended && !recording)) return;
     const requestedUrl = musicUrl;
     music.play().catch(error => {
-      if (musicUrl !== requestedUrl || error.name === 'AbortError') return;
+      if (musicUrl !== requestedUrl || !music.paused || error.name === 'AbortError') return;
+      setPlaying(false);
       musicStatus.textContent = 'Muusika ei käivitunud. Proovi helimängija nuppu või vali teine fail.';
     });
   }
   musicFile.addEventListener('change', () => {
     const file = musicFile.files[0];
     if (!file) return;
-    playing = false; lastTs = 0; beat = START_BEAT; syncUi();
-    clearMusic(false);
-    musicName = file.name;
-    musicUrl = URL.createObjectURL(file);
-    musicStatus.textContent = 'Avan faili: ' + file.name;
-    removeMusic.hidden = false;
-    music.src = musicUrl;
+    loadMusic(URL.createObjectURL(file), file.name);
   });
   music.addEventListener('loadedmetadata', () => {
     if (!musicUrl) return;
-    musicReady = true; music.hidden = false; soundIn.checked = false;
-    musicStatus.textContent = musicName + ' · Vajuta Mängi. ' + GAME.soundWord + ' ja takti saad soovi korral uuesti sisse lülitada.';
-    if (playing) playMusic();
+    music.hidden = false; soundIn.checked = false;
+    musicStatus.textContent = recording ? musicName : musicName + ' · Sellele failile pole sõnade ajastust lisatud.';
+  });
+  music.addEventListener('play', () => {
+    if (!musicUrl || music.paused || playing) return;
+    if (recording || (beat >= total - 0.001 && music.currentTime === 0)) {
+      beat = recording ? recordingPosition(music.currentTime).beat : START_BEAT;
+    }
+    setPlaying(true);
+  });
+  music.addEventListener('pause', () => {
+    if (musicUrl && music.paused && !music.ended) setPlaying(false);
+  });
+  music.addEventListener('seeked', () => {
+    if (!recording) return;
+    beat = recordingPosition(music.currentTime).beat;
+    syncUi();
+  });
+  music.addEventListener('ended', () => {
+    if (recording) {
+      beat = total - 0.001;
+      setPlaying(false);
+    }
   });
   music.addEventListener('error', () => {
     if (!musicUrl || !music.error) return;
+    setPlaying(false);
     clearMusic();
     musicStatus.textContent = 'Seda helifaili ei saa esitada. Proovi MP3- või WAV-faili.';
   });
@@ -1465,7 +1595,12 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
     }
     b.addEventListener('click', () => {
       const seg = segs.find(s => s.lineIndex === idx);
-      beat = seg.start; start();
+      if (recording) {
+        const row = recording.lines.find(([i]) => segs[i].lineIndex === idx);
+        if (row) music.currentTime = cueStart(row);
+      }
+      beat = seg.start;
+      start();
     });
     li.appendChild(b); linesEl.appendChild(li);
   });
@@ -1502,33 +1637,93 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
     const s = segs[segAt(beat)];
     linesEl.querySelectorAll('button').forEach(b => b.setAttribute('aria-current', String(Number(b.dataset.line) === s.lineIndex)));
   }
+  function setPlaying(value) {
+    playing = value;
+    lastTs = 0;
+    if (playing) ensureAudio()?.resume?.();
+    syncUi();
+  }
+
   function start() {
-    if (beat >= total - 0.01) { beat = 0; if (musicReady) music.currentTime = 0; }
-    playing = true; lastTs = 0; ensureAudio()?.resume?.(); syncUi();
+    if (recording && music.ended) {
+      music.currentTime = 0;
+      beat = START_BEAT;
+    } else if (!recording && beat >= total - 0.001 && (!musicUrl || music.ended || music.currentTime === 0)) {
+      beat = START_BEAT;
+      if (musicUrl) music.currentTime = 0;
+    }
+    setPlaying(true);
     playMusic();
   }
+
+  const cueStart = ([, starts]) => starts[0] ?? starts[1];
+
+  function recordingPosition(seconds) {
+    const { lines, end } = recording;
+    const first = lines[0];
+    const wordsFor = ([i]) => splitWords(segs[i].words);
+    if (seconds < first[1][0]) {
+      return { beat: seconds / first[1][0] * segs[0].len, nextWords: wordsFor(first) };
+    }
+    if (seconds >= end) return { beat: segs.at(-1).start };
+    const rowIndex = lines.findIndex((_, i) => seconds < (i + 1 < lines.length ? cueStart(lines[i + 1]) : end));
+    const row = lines[rowIndex];
+    const [segIndex, starts, stop] = row;
+    const nextRow = lines[rowIndex + 1];
+    const seg = segs[segIndex];
+    const nextTime = stop ?? (nextRow ? cueStart(nextRow) : end);
+    const start = cueStart(row);
+    const progress = (seconds - start) / (nextTime - start);
+    return {
+      beat: seg.start + Math.min(progress * seg.len, seg.len - 0.0001),
+      words: wordsFor(row),
+      wordIndex: starts[0] !== null && seconds < nextTime ? starts.findLastIndex(start => start <= seconds) : -1,
+      nextWords: nextRow && wordsFor(nextRow),
+    };
+  }
+
   function frame(ts) {
-    if (playing) {
+    if (recording) {
+      const position = recordingPosition(music.currentTime);
+      const prev = beat;
+      beat = position.beat;
+      if (playing && !music.seeking && soundIn.checked && beat - prev < 1) {
+        for (const e of EVENTS) if (e.beat > prev && e.beat <= beat) playSound(e.type, e.strong);
+      }
+      if (segAt(prev) !== segAt(beat)) syncUi();
+      render(beat, position);
+      requestAnimationFrame(frame);
+      return;
+    }
+    // Wait for the selected track to play or finish before advancing the animation.
+    const musicCanAdvance = !musicUrl || music.ended ||
+      (!music.paused && music.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA);
+    if (playing && musicCanAdvance) {
       if (lastTs) {
         const prev = beat;
-        let next = beat + (ts - lastTs) / 1000 * bpm / 60 * (segs[segAt(beat)].tempo ?? 1);
-        const s = segs[segAt(prev)];
-        if (loopIn.checked && s.lineIndex !== undefined && next >= s.start + s.len) next = s.start + (next - s.start - s.len);
-        else for (const e of EVENTS) if (e.beat > prev && e.beat <= next) playSound(e.type, e.strong);
-        if (next >= total) { next = total - 0.001; playing = false; music.pause(); }
-        beat = next;
-        if (segAt(prev) !== segAt(beat)) syncUi();
-        if (!playing) syncUi();
+        const step = (ts - lastTs) / 1000 * DEFAULT_BPM / 60 * (segs[segAt(beat)].tempo ?? 1);
+        beat = Math.min(beat + step, total - 0.001);
+        for (const e of EVENTS) if (e.beat > prev && e.beat <= beat) playSound(e.type, e.strong);
+        if (beat >= total - 0.001 && (!musicUrl || music.ended)) setPlaying(false);
+        else if (segAt(prev) !== segAt(beat)) syncUi();
       }
-      lastTs = ts;
+      if (playing) lastTs = ts;
+    } else {
+      lastTs = 0;
     }
     render(beat);
     requestAnimationFrame(frame);
   }
 
-  playBtn.addEventListener('click', () => { if (playing) { playing = false; music.pause(); syncUi(); } else start(); });
-  document.getElementById('restart').addEventListener('click', () => { beat = 0; if (musicReady) music.currentTime = 0; start(); });
-  bpmIn.addEventListener('input', () => { bpm = Number(bpmIn.value); bpmOut.textContent = `${bpm} lööki/min`; });
+  playBtn.addEventListener('click', () => {
+    if (playing) { music.pause(); setPlaying(false); }
+    else start();
+  });
+  document.getElementById('restart').addEventListener('click', () => {
+    beat = START_BEAT;
+    if (musicUrl) music.currentTime = 0;
+    start();
+  });
   document.getElementById('full').addEventListener('click', () => {
     const st = document.getElementById('stage');
     if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
@@ -1539,7 +1734,8 @@ h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin
   });
 
   beat = START_BEAT;
-  if (!new URLSearchParams(location.search).has('export')) {
+  document.getElementById('game-view').hidden = false;
+  if (!params.has('export')) {
     document.fonts?.ready?.then(() => render(beat));
     syncUi();
     requestAnimationFrame(frame);
